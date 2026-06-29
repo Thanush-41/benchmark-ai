@@ -13,11 +13,11 @@ function extractKaiAnswer(payload) {
 }
 
 async function queryKai(question, markdown) {
-  if (process.env.KAI_URL) {
-    try {
-      const response = await axios.post(process.env.KAI_URL, {
-        query: question
-      }, {
+  const kaiUrl = process.env.KAI_URL || 'http://localhost:8080/chat';
+  try {
+    const response = await axios.post(kaiUrl, {
+      query: question
+    }, {
         params: {
           stream: 'true'
         },
