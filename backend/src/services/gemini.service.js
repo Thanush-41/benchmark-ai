@@ -8,7 +8,7 @@ function normalizeMarkdown(markdown = '') {
   return markdown.replace(/[#>*`_\-]/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-function buildFallbackQuestions(markdown, questionCount = 10) {
+function buildFallbackQuestions(markdown, questionCount = 5) {
   const lines = markdown
     .split(/\n+/)
     .map((line) => line.trim())
@@ -16,29 +16,36 @@ function buildFallbackQuestions(markdown, questionCount = 10) {
 
   const headings = lines.filter((line) => /^#{1,6}\s+/.test(line));
   const bodySentences = normalizeMarkdown(markdown)
-    .split(/\.|\!/)
+    .split(/\.|\!|\?/)
     .map((item) => item.trim())
     .filter((item) => item.length > 12);
 
   const candidates = [];
   if (headings.length) {
     headings.forEach((heading, index) => {
-      candidates.push(`What is covered in ${heading.replace(/^#{1,6}\s+/, '')}?`);
+      const topic = heading.replace(/^#{1,6}\s+/, '').trim();
+      candidates.push(`What key points does this section cover: "${topic}"?`);
       if (index < bodySentences.length) {
-        candidates.push(`Explain the significance of ${bodySentences[index].slice(0, 60)}.`);
+        const snippet = bodySentences[index].slice(0, 60);
+        candidates.push(`How does the document explain: "${snippet}"?`);
       }
     });
   }
 
+  const seen = new Set();
   bodySentences.forEach((sentence) => {
     if (candidates.length >= questionCount * 2) {
       return;
     }
     const compact = sentence.slice(0, 90);
-    candidates.push(`Summarize the following concept: ${compact}`);
+    const question = `Describe the main idea behind: ${compact}`;
+    if (!seen.has(question)) {
+      seen.add(question);
+      candidates.push(question);
+    }
   });
 
-  return candidates.slice(0, questionCount);
+  return [...new Set(candidates)].slice(0, questionCount);
 }
 
 function isGeminiQuotaError(error) {
