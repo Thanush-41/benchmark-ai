@@ -56,39 +56,43 @@ function Dashboard() {
         </div>
       ) : (
         <div className="card-list">
-          {evaluations.map((item) => (
-            <article className="card" key={item._id}>
-              <div className="card-top">
-                <div>
-                  <h3>{item.filename}</h3>
-                  <p>{new Date(item.createdAt).toLocaleString()}</p>
+          {evaluations.map((item) => {
+            const score = item.averageAccuracy ?? 0;
+            const statusClass = score >= 2.5 ? 'positive' : 'negative';
+            return (
+              <article className="card" key={item._id}>
+                <div className="card-top">
+                  <div>
+                    <h3>{item.filename}</h3>
+                    <p>{new Date(item.createdAt).toLocaleString()}</p>
+                  </div>
+                  <span className={`pill ${statusClass}`}>{score}/5</span>
                 </div>
-                <span className="pill">{item.averageAccuracy ?? 0}/5</span>
-              </div>
 
-              <div className="metrics-row">
-                <div>
-                  <strong>{item.questions?.length ?? 0}</strong>
-                  <span>Questions</span>
+                <div className="metrics-row">
+                  <div>
+                    <strong>{item.questions?.length ?? 0}</strong>
+                    <span>Questions</span>
+                  </div>
+                  <div>
+                    <strong>{item.hallucinationCount ?? 0}</strong>
+                    <span>Hallucinations</span>
+                  </div>
+                  <div>
+                    <strong>{item.averageLatency ?? 0}s</strong>
+                    <span>Average latency</span>
+                  </div>
                 </div>
-                <div>
-                  <strong>{item.hallucinationCount ?? 0}</strong>
-                  <span>Hallucinations</span>
-                </div>
-                <div>
-                  <strong>{item.averageLatency ?? 0}s</strong>
-                  <span>Average latency</span>
-                </div>
-              </div>
 
-              <div className="card-actions">
-                <Link className="button" to={`/evaluations/${item._id}`}>View details</Link>
-                <button className="button secondary" type="button" onClick={() => handleDelete(item._id)}>
-                  Delete
-                </button>
-              </div>
-            </article>
-          ))}
+                <div className="card-actions">
+                  <Link className="button" to={`/evaluations/${item._id}`}>View details</Link>
+                  <button className="button secondary" type="button" onClick={() => handleDelete(item._id)}>
+                    Delete
+                  </button>
+                </div>
+              </article>
+            );
+          })}
         </div>
       )}
     </section>

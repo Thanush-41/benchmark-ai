@@ -9,7 +9,7 @@ async function uploadMarkdown(req, res) {
 
     const filename = req.file.originalname || 'upload.md';
     const markdown = req.file.buffer.toString('utf8');
-    const evaluation = await createEvaluationFromMarkdown({ filename, markdown, questionCount: 5 });
+    const evaluation = await createEvaluationFromMarkdown({ filename, markdown, questionCount: 50 });
 
     return res.status(201).json(evaluation);
   } catch (error) {
@@ -20,7 +20,7 @@ async function uploadMarkdown(req, res) {
 
 async function evaluateMarkdown(req, res) {
   try {
-    const { filename, markdown, questionCount = 5 } = req.body;
+    const { filename, markdown, questionCount = 50 } = req.body;
     if (!filename || !markdown) {
       return res.status(400).json({ error: 'filename and markdown are required.' });
     }
@@ -88,6 +88,20 @@ async function buildEvaluationWorkbook(evaluation) {
       hallucination: entry.hallucination ? 'Yes' : 'No',
       reason: entry.reason || ''
     });
+  });
+
+  const averageAccuracy = Number((evaluation?.averageAccuracy ?? (
+    (evaluation?.questions || []).reduce((sum, entry) => sum + (entry.accuracy ?? (entry.score ?? 0)), 0) /
+    Math.max((evaluation?.questions || []).length, 1)
+  )).toFixed(1));
+
+  worksheet.addRow({});
+  worksheet.addRow({
+    question: 'Total average accuracy',
+    score: `${averageAccuracy}/5`,
+    latency: '',
+    hallucination: '',
+    reason: ''
   });
 
   return workbook.xlsx.writeBuffer();

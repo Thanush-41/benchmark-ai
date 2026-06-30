@@ -6,8 +6,9 @@ const { buildEvaluationSummary } = require('./report.service');
 
 const inMemoryStore = [];
 
-async function createEvaluationFromMarkdown({ filename, markdown, questionCount = 5 }) {
-  const questions = await generateQuestions(markdown, questionCount);
+async function createEvaluationFromMarkdown({ filename, markdown, questionCount = 50 }) {
+  const existingQuestions = await getExistingQuestionTexts(filename);
+  const questions = await generateQuestions(markdown, questionCount, existingQuestions);
   const results = [];
   const qaPairs = [];
 
@@ -54,6 +55,31 @@ async function createEvaluationFromMarkdown({ filename, markdown, questionCount 
 
   await persistEvaluation(record);
   return record;
+}
+
+async function getExistingQuestionTexts(filename) {
+  if (!filename) {
+    return [];
+  }
+
+  if (process.env.MONGODB_URI) {
+    try {
+      const existing = await Evaluation.find({ filename }).sort({ createdAt: -1 }).limit(1);
+      if (existing.length && Array.isArray(existing[0].questions)) {
+        return existing[0].questions
+          .map((item) => item.question)
+          .filter(Boolean);
+      }
+    } catch (error) {
+      console.warn('MongoDB lookup for existing questions failed.', error.message);
+    }
+  }
+
+  const inMemoryRecord = inMemoryStore
+    .slice()
+    .reverse()
+    .find((item) => item.filename === filename);
+  return inMemoryRecord ? inMemoryRecord.questions.map((item) => item.question).filter(Boolean) : [];
 }
 
 async function persistEvaluation(record) {

@@ -26,7 +26,7 @@ function Upload() {
         response = await evaluateMarkdown({
           filename: filename || 'upload.md',
           markdown,
-          questionCount: 5
+          questionCount: 50
         });
       }
 

@@ -69,6 +69,8 @@ function Evaluation() {
     setExpandedQuestion((current) => (current === index ? null : index));
   };
 
+  const accuracyStatus = averageAccuracy >= 2.5 ? 'positive' : 'negative';
+
   return (
     <section className="panel">
       <div className="section-heading">
@@ -77,7 +79,7 @@ function Evaluation() {
           <h2>{evaluation.filename}</h2>
         </div>
         <div className="pill-row">
-          <span className="pill">Avg accuracy {averageAccuracy}/5</span>
+          <span className={`pill ${accuracyStatus}`}>Avg accuracy {averageAccuracy}/5</span>
           <span className="pill">{evaluation.hallucinationCount ?? 0} hallucinations</span>
           <button className="button secondary" type="button" onClick={handleExport}>Export Excel</button>
         </div>
@@ -103,37 +105,42 @@ function Evaluation() {
       </div>
 
       <div className="question-list">
-        {evaluation.questions?.map((entry, index) => (
-          <article className="card question-card" key={`${entry.question}-${index}`}>
-            <button type="button" className="question-summary" onClick={() => toggleQuestion(index)}>
-              <span className="summary-cell id-cell">#{index + 1}</span>
-              <span className="summary-cell question-cell">{entry.question}</span>
-              <span className="summary-cell accuracy-cell">{getEntryAccuracy(entry)}/5</span>
-              <span className="summary-cell latency-cell">{entry.latency}s</span>
-            </button>
+        {evaluation.questions?.map((entry, index) => {
+          const entryAccuracy = getEntryAccuracy(entry);
+          const entryStatus = entryAccuracy >= 2.5 ? 'positive' : 'negative';
 
-            {expandedQuestion === index ? (
-              <div className="expand-panel">
-                <div className="answer-grid">
-                  <div>
-                    <h4>Bot answer</h4>
-                    <ReactMarkdown>{entry.botAnswer}</ReactMarkdown>
+          return (
+            <article className="card question-card" key={`${entry.question}-${index}`}>
+              <button type="button" className="question-summary" onClick={() => toggleQuestion(index)}>
+                <span className="summary-cell id-cell">#{index + 1}</span>
+                <span className="summary-cell question-cell">{entry.question}</span>
+                <span className={`summary-cell accuracy-cell ${entryStatus}`}>{entryAccuracy}/5</span>
+                <span className="summary-cell latency-cell">{entry.latency}s</span>
+              </button>
+
+              {expandedQuestion === index ? (
+                <div className="expand-panel">
+                  <div className="answer-grid">
+                    <div>
+                      <h4>Bot answer</h4>
+                      <ReactMarkdown>{entry.botAnswer}</ReactMarkdown>
+                    </div>
+                    <div>
+                      <h4>Expected answer</h4>
+                      <ReactMarkdown>{entry.expectedAnswer}</ReactMarkdown>
+                    </div>
                   </div>
-                  <div>
-                    <h4>Expected answer</h4>
-                    <ReactMarkdown>{entry.expectedAnswer}</ReactMarkdown>
+                  <div className="detail-list">
+                    <p><strong>Accuracy:</strong> {getEntryAccuracy(entry)}/5</p>
+                    <p><strong>Hallucination:</strong> {entry.hallucination ? 'Yes' : 'No'}</p>
+                    <p><strong>Reason:</strong> {entry.reason}</p>
+                    <p><strong>Tokens:</strong> prompt {entry.tokens?.prompt || 0}, completion {entry.tokens?.completion || 0}, total {entry.tokens?.total || 0}</p>
                   </div>
                 </div>
-                <div className="detail-list">
-                  <p><strong>Accuracy:</strong> {getEntryAccuracy(entry)}/5</p>
-                  <p><strong>Hallucination:</strong> {entry.hallucination ? 'Yes' : 'No'}</p>
-                  <p><strong>Reason:</strong> {entry.reason}</p>
-                  <p><strong>Tokens:</strong> prompt {entry.tokens?.prompt || 0}, completion {entry.tokens?.completion || 0}, total {entry.tokens?.total || 0}</p>
-                </div>
-              </div>
-            ) : null}
-          </article>
-        ))}
+              ) : null}
+            </article>
+          );
+        })}
       </div>
     </section>
   );
