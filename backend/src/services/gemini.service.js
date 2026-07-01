@@ -6,7 +6,7 @@ const geminiState = {
 
 const QUESTION_TIMEOUT_MS = Number(process.env.GEMINI_QUESTION_TIMEOUT_MS || 90000);
 const JUDGMENT_TIMEOUT_MS = Number(process.env.GEMINI_JUDGMENT_TIMEOUT_MS || 90000);
-const DEFAULT_QUESTION_COUNT = 50;
+const DEFAULT_QUESTION_COUNT = 20;
 
 function normalizeMarkdown(markdown = '') {
   return markdown.replace(/[#>*`_\-]/g, ' ').replace(/\s+/g, ' ').trim();
@@ -387,7 +387,7 @@ async function judgeAnswer(markdown, question, botAnswer) {
     latency: Number((1.2 + Math.random() * 1.5).toFixed(1)),
     tokens: {
       prompt: 280 + Math.floor(Math.random() * 120),
-      completion: 90 + Math.floor(Math.random() * 50),
+      completion: 90 + Math.floor(Math.random() * 20),
       total: 370 + Math.floor(Math.random() * 170)
     }
   };

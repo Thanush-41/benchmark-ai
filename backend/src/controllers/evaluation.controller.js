@@ -9,7 +9,7 @@ async function uploadMarkdown(req, res) {
 
     const filename = req.file.originalname || 'upload.md';
     const markdown = req.file.buffer.toString('utf8');
-    const evaluation = await createEvaluationFromMarkdown({ filename, markdown, questionCount: 50 });
+    const evaluation = await createEvaluationFromMarkdown({ filename, markdown, questionCount: 20 });
 
     return res.status(201).json(evaluation);
   } catch (error) {
@@ -20,7 +20,7 @@ async function uploadMarkdown(req, res) {
 
 async function evaluateMarkdown(req, res) {
   try {
-    const { filename, markdown, questionCount = 50 } = req.body;
+    const { filename, markdown, questionCount = 20 } = req.body;
     if (!filename || !markdown) {
       return res.status(400).json({ error: 'filename and markdown are required.' });
     }

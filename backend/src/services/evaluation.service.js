@@ -6,7 +6,7 @@ const { buildEvaluationSummary } = require('./report.service');
 
 const inMemoryStore = [];
 
-async function createEvaluationFromMarkdown({ filename, markdown, questionCount = 50 }) {
+async function createEvaluationFromMarkdown({ filename, markdown, questionCount = 20 }) {
   const existingQuestions = await getExistingQuestionTexts(filename);
   const questions = await generateQuestions(markdown, questionCount, existingQuestions);
   const results = [];
