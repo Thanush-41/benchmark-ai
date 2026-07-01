@@ -265,6 +265,112 @@
   color: #fda4af;
 }
 
+.summary-grid,
+.evaluation-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 18px 30px rgba(148, 163, 184, 0.12);
+}
+
+.stat-label {
+  margin: 0 0 10px;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.stat-card strong {
+  display: block;
+  margin: 0;
+  font-size: 2rem;
+  color: #0f172a;
+}
+
+.stat-card span {
+  display: block;
+  margin-top: 8px;
+  color: #64748b;
+}
+
+.history-card,
+.evaluation-panel .history-card {
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 18px;
+  padding: 24px;
+}
+
+.history-table,
+.evaluation-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table th,
+.history-table td,
+.evaluation-table th,
+.evaluation-table td {
+  text-align: left;
+  padding: 14px 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.history-table th,
+.evaluation-table th {
+  color: #475569;
+  font-weight: 600;
+}
+
+.history-table tr:hover,
+.evaluation-table tr:hover {
+  background: rgba(56, 189, 248, 0.06);
+}
+
+.button.small {
+  padding: 8px 14px;
+  font-size: 0.9rem;
+}
+
+.section-copy {
+  margin: 8px 0 0;
+  color: #475569;
+  max-width: 680px;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+}
+
+.detail-toggle {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.detail-row td {
+  background: #f8fafc;
+}
+
+.detail-panel {
+  display: grid;
+  gap: 18px;
+}
+
+@media (max-width: 1040px) {
+  .summary-grid,
+  .evaluation-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 780px) {
   .topbar,
   .page-content {

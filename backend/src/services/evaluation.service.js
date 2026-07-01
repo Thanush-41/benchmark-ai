@@ -13,7 +13,7 @@ async function createEvaluationFromMarkdown({ filename, markdown, questionCount 
   const qaPairs = [];
 
   for (const question of questions) {
-    const answer = await queryKai(question, markdown);
+    const { answer, latency } = await queryKai(question, markdown);
     qaPairs.push({ question, answer });
     results.push({
       question,
@@ -22,7 +22,7 @@ async function createEvaluationFromMarkdown({ filename, markdown, questionCount 
       score: 0,
       hallucination: false,
       reason: 'Pending evaluation',
-      latency: 0,
+      latency,
       tokens: { prompt: 0, completion: 0, total: 0 }
     });
   }
@@ -38,7 +38,7 @@ async function createEvaluationFromMarkdown({ filename, markdown, questionCount 
       rawScore: evaluation.score ?? 0,
       hallucination: evaluation.hallucination,
       reason: evaluation.reason,
-      latency: evaluation.latency,
+      latency: results[index].latency,
       tokens: evaluation.tokens
     };
   });

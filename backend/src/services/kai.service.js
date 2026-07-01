@@ -79,6 +79,8 @@ function extractKaiAnswer(payload) {
 
 async function queryKai(question, markdown) {
   const kaiUrl = process.env.KAI_URL || 'http://localhost:8080/chat';
+  const startTime = Date.now();
+
   try {
     const response = await axios.post(kaiUrl, {
       query: question
@@ -95,7 +97,10 @@ async function queryKai(question, markdown) {
       timeout: 20000
     });
 
-    return extractKaiAnswer(response?.data);
+    return {
+      answer: extractKaiAnswer(response?.data),
+      latency: Number(((Date.now() - startTime) / 1000).toFixed(2))
+    };
   } catch (error) {
     const detail = error.response?.data;
     const bodyText = typeof detail === 'string' ? detail : JSON.stringify(detail || {});
@@ -106,9 +111,12 @@ async function queryKai(question, markdown) {
       headers: error.response?.headers,
       config: error.config
     });
-  }
 
-  return `A benchmark answer for: ${question}`;
+    return {
+      answer: `A benchmark answer for: ${question}`,
+      latency: Number(((Date.now() - startTime) / 1000).toFixed(2))
+    };
+  }
 }
 
 module.exports = {
