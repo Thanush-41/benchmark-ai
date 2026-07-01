@@ -21,6 +21,17 @@ const evaluationSchema = new mongoose.Schema({
   filename: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
   questions: [questionResultSchema],
+  sourceMarkdown: String,
+  params: {
+    temperature: { type: Number, default: 0.8 },
+    topK: { type: Number, default: 40 },
+    topP: { type: Number, default: 0.95 },
+    minP: { type: Number, default: 0.05 },
+    repeatPenalty: { type: Number, default: 1.0 },
+    presencePenalty: { type: Number, default: 0.0 },
+    frequencyPenalty: { type: Number, default: 0.0 }
+  },
+  status: { type: String, default: 'pending' },
   averageScore: Number,
   averageAccuracy: Number,
   averageLatency: Number,

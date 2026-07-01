@@ -9,6 +9,7 @@ export const uploadMarkdown = (formData) => client.post('/upload', formData, {
 });
 
 export const evaluateMarkdown = (payload) => client.post('/evaluate', payload);
+export const rejudgeEvaluation = (id) => client.patch(`/evaluations/${id}/rejudge`);
 export const getEvaluations = () => client.get('/evaluations');
 export const getEvaluationById = (id) => client.get(`/evaluations/${id}`);
 export const deleteEvaluation = (id) => client.delete(`/evaluations/${id}`);

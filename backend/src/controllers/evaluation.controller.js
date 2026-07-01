@@ -1,5 +1,11 @@
 const ExcelJS = require('exceljs');
-const { createEvaluationFromMarkdown, listEvaluations, getEvaluationById, deleteEvaluation } = require('../services/evaluation.service');
+const {
+  createEvaluationFromMarkdown,
+  listEvaluations,
+  getEvaluationById,
+  resumeEvaluation,
+  deleteEvaluation
+} = require('../services/evaluation.service');
 
 async function uploadMarkdown(req, res) {
   try {
@@ -52,6 +58,16 @@ async function show(req, res) {
     return res.json(evaluation);
   } catch (error) {
     return res.status(500).json({ error: error.message || 'Failed to fetch evaluation.' });
+  }
+}
+
+async function rejudgeEvaluation(req, res) {
+  try {
+    const evaluation = await resumeEvaluation(req.params.id);
+    return res.json(evaluation);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: error.message || 'Failed to resume evaluation.' });
   }
 }
 
@@ -125,6 +141,7 @@ module.exports = {
   evaluateMarkdown,
   list,
   show,
+  rejudgeEvaluation,
   remove,
   download,
   buildEvaluationWorkbook

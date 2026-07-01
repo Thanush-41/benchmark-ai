@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { downloadEvaluation, getEvaluationById } from '../api';
+import { downloadEvaluation, getEvaluationById, rejudgeEvaluation } from '../api';
 
 function Evaluation() {
   const { id } = useParams();
   const [evaluation, setEvaluation] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [resuming, setResuming] = useState(false);
   const [error, setError] = useState('');
   const [expandedQuestion, setExpandedQuestion] = useState(null);
 
@@ -51,6 +52,19 @@ function Evaluation() {
     }
   }
 
+  async function handleResume() {
+    try {
+      setResuming(true);
+      setError('');
+      const response = await rejudgeEvaluation(id);
+      setEvaluation(response.data);
+    } catch (err) {
+      setError(err.message || 'Unable to resume evaluation.');
+    } finally {
+      setResuming(false);
+    }
+  }
+
   if (loading) {
     return <p>Loading evaluation…</p>;
   }
@@ -81,6 +95,9 @@ function Evaluation() {
         </div>
         <div className="button-group">
           <button className="button secondary" type="button" onClick={handleExport}>Export report</button>
+          <button className="button secondary" type="button" onClick={handleResume} disabled={resuming}>
+            {resuming ? 'Resuming…' : 'Resume failed evaluation'}
+          </button>
         </div>
       </div>
 

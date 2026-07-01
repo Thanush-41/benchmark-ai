@@ -109,6 +109,27 @@ function extractGeminiText(response) {
     }
   }
 
+  if (Array.isArray(response.candidates)) {
+    const candidate = response.candidates[0] || {};
+    if (typeof candidate.text === 'string' && candidate.text.trim()) {
+      return candidate.text;
+    }
+    if (Array.isArray(candidate.content)) {
+      const textContent = candidate.content.find((item) => item?.type === 'output_text' || item?.type === 'text');
+      if (textContent && typeof textContent.text === 'string') {
+        return textContent.text;
+      }
+      const combined = candidate.content
+        .map((item) => (typeof item?.text === 'string' ? item.text : ''))
+        .filter(Boolean)
+        .join(' ')
+        .trim();
+      if (combined) {
+        return combined;
+      }
+    }
+  }
+
   if (Array.isArray(response.result?.output)) {
     const firstOutput = response.result.output[0] || {};
     if (typeof firstOutput.text === 'string' && firstOutput.text.trim()) {
@@ -298,8 +319,10 @@ async function generateQuestions(markdown, questionCount = DEFAULT_QUESTION_COUN
       'Gemini question generation'
     );
     const text = extractGeminiText(response) || '';
+    const preview = text.length > 1500 ? `${text.slice(0, 1500)}… [truncated ${text.length} chars]` : text;
     console.log('Gemini question generation response raw:', response);
-    console.log('Gemini question generation response text:', text.slice(0, 1000));
+    console.log('Gemini question generation response text:', preview);
+    console.log('Gemini question generation response length:', text.length);
     const parsed = parseJsonArray(text);
     const initialQuestions = (Array.isArray(parsed) ? parsed : parseTextLines(text) || [])
       .map((item) => String(item).trim())
